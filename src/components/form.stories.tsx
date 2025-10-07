@@ -77,9 +77,9 @@ const ProfileForm = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="username" {...field} />
-                </FormControl>
+                <FormControl
+                  render={<Input placeholder="username" {...field} />}
+                />
                 <FormDescription>
                   This is your public display name.
                 </FormDescription>

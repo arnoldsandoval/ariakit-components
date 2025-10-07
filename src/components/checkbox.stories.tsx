@@ -179,22 +179,28 @@ export const FormMultiple: Story = {
                             key={item.id}
                             className="flex flex-row items-center gap-2"
                           >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onChange={(event) => {
-                                  fn()(event);
-                                  const checked = event.target.checked;
-                                  return checked
-                                    ? field.onChange([...field.value, item.id])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== item.id
-                                        )
-                                      );
-                                }}
-                              />
-                            </FormControl>
+                            <FormControl
+                              render={
+                                <Checkbox
+                                  checked={field.value?.includes(item.id)}
+                                  onChange={(event) => {
+                                    fn()(event);
+                                    const checked = event.target.checked;
+                                    return checked
+                                      ? field.onChange([
+                                          ...field.value,
+                                          item.id,
+                                        ])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== item.id
+                                          )
+                                        );
+                                  }}
+                                />
+                              }
+                            />
+
                             <FormLabel className="text-sm font-normal">
                               {item.label}
                             </FormLabel>

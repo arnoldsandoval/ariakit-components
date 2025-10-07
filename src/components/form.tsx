@@ -1,7 +1,7 @@
 "use client";
 
 import * as LabelPrimitive from "@radix-ui/react-label";
-import { Slot } from "@radix-ui/react-slot";
+import { Role } from "@ariakit/react";
 import { ComponentProps, createContext, useContext, useId } from "react";
 import {
   Controller,
@@ -104,12 +104,12 @@ function FormLabel({
   );
 }
 
-function FormControl({ ...props }: ComponentProps<typeof Slot>) {
+function FormControl({ ...props }: ComponentProps<typeof Role>) {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
   return (
-    <Slot
+    <Role
       data-slot="form-control"
       id={formItemId}
       aria-describedby={
