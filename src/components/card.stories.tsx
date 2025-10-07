@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/card";
+import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -38,7 +39,7 @@ const meta = {
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 placeholder="m@example.com"
@@ -55,7 +56,7 @@ const meta = {
                   Forgot your password?
                 </a>
               </div>
-              <input id="password" type="password" required />
+              <Input id="password" type="password" required />
             </div>
           </div>
         </form>

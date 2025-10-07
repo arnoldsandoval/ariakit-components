@@ -7,15 +7,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  useFormField,
 } from "@/components/form";
 import { Input } from "@/components/input";
 import { Toaster } from "@/components/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ComponentType } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { expect, fn, userEvent } from "storybook/test";
+import { expect, fn, userEvent, within } from "storybook/test";
 import * as z from "zod";
 
 const formSchema = z.object({
@@ -38,7 +38,7 @@ const meta = {
     layout: "centered",
   },
   render: () => <ProfileForm onSubmit={fn()} />,
-} as Meta<ComponentType>;
+} as Meta;
 
 export default meta;
 
@@ -146,6 +146,65 @@ export const ShouldShowErrorWhenInvalidInput: Story = {
           exact: true,
         })
       ).toBeVisible();
+    });
+  },
+};
+
+/**
+ * Component that deliberately calls useFormField outside of FormField context
+ * to trigger the error case for test coverage
+ */
+const InvalidFormFieldUsage = () => {
+  try {
+    useFormField(); // This will throw an error
+    return <div>This should not render</div>;
+  } catch (error) {
+    return (
+      <div data-testid="error-caught" className="text-red-500 text-sm">
+        Error: {(error as Error).message}
+      </div>
+    );
+  }
+};
+
+export const ContextErrorTest: Story = {
+  name: "Form components should throw error when used outside context",
+  tags: ["!dev", "!autodocs"],
+  parameters: {
+    a11y: { disable: true }, // Disable a11y testing for error demonstration
+    chromatic: { disableSnapshot: true }, // Don't snapshot error states
+  },
+  render: () => (
+    <div
+      data-testid="context-test"
+      className="p-4 border border-red-200 bg-red-50 rounded"
+    >
+      <h3 className="font-semibold text-red-800 mb-2">Context Error Test</h3>
+      <p className="text-red-700 text-sm mb-2">
+        If FormField, FormControl, or other form components are used outside of
+        their proper context, they will throw an error. This component
+        demonstrates that behavior:
+      </p>
+      <InvalidFormFieldUsage />
+      <p className="text-red-700 text-xs mt-2">
+        The error above validates that form components properly throw when
+        context is null.
+      </p>
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("verify context error is thrown and caught", async () => {
+      const contextTest = canvas.getByTestId("context-test");
+      expect(contextTest).toBeInTheDocument();
+
+      // Verify the error was caught and displayed
+      const errorMessage = await canvas.findByTestId("error-caught");
+      expect(errorMessage).toBeInTheDocument();
+      expect(errorMessage.textContent).toMatch(
+        /Error.*useFormField should be used within.*FormField|cannot destructure.*useFormContext/i
+      );
     });
   },
 };

@@ -1,7 +1,6 @@
 import { Calendar } from "@/components/calendar";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { addDays } from "date-fns";
-import * as React from "react";
 import { expect, fn, userEvent } from "storybook/test";
 
 /**
@@ -133,30 +132,6 @@ export const DateOfBirth: Story = {
     toYear: new Date().getFullYear(),
     captionLayout: "dropdown",
     disabled: { after: new Date() },
-  },
-};
-
-/**
- * Basic usage example showing controlled state like you'd use in a form.
- */
-export const FormExample: Story = {
-  render: (args) => {
-    const [date, setDate] = React.useState<Date | undefined>(new Date());
-
-    return (
-      <div className="space-y-4">
-        <div className="text-sm font-medium">
-          Selected date: {date?.toLocaleDateString() || "None"}
-        </div>
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          className="rounded-lg border"
-          {...args}
-        />
-      </div>
-    );
   },
 };
 

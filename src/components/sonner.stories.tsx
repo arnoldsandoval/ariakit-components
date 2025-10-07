@@ -8,7 +8,7 @@ import { Toaster } from "@/components/sonner";
 /**
  * An opinionated toast component for React.
  */
-const meta: Meta<typeof Toaster> = {
+const meta = {
   title: "ui/Sonner",
   component: Toaster,
   tags: ["autodocs"],
@@ -96,7 +96,7 @@ export const WithAction: Story = {
             description: "Sunday, December 03, 2023 at 9:00 AM",
             action: {
               label: "Undo",
-              onClick: () => console.log("Undo"),
+              onClick: fn(),
             },
           })
         }
