@@ -115,4 +115,4 @@ function AvatarFallback({
   );
 }
 
-export { Avatar, AvatarFallback, AvatarImage };
+export { Avatar, AvatarFallback, AvatarImage, useAvatarContext };

@@ -30,11 +30,6 @@ function AlertDialogTrigger({
   return <DialogDisclosure data-slot="alert-dialog-trigger" {...props} />;
 }
 
-// Ariakit renders directly into portal by default, so this is a no-op for API compatibility
-function AlertDialogPortal({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
-
 function AlertDialogOverlay({
   className,
   ...props
@@ -169,7 +164,6 @@ export {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
-  AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,
 };

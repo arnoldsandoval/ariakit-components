@@ -1,5 +1,6 @@
 import { Badge } from "@/components/badge";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 /**
  * Displays a badge or a component that looks like a badge.
@@ -75,9 +76,7 @@ export const Outline: Story = {
  */
 export const AsLink: Story = {
   render: (args) => (
-    <Badge {...args} render={(props) => <a href="#" {...props} />}>
-      {args.children}
-    </Badge>
+    <Badge render={(props) => <a href="#" {...props} />} {...args} />
   ),
   args: {
     children: "Link Badge",
@@ -90,12 +89,83 @@ export const AsLink: Story = {
  */
 export const AsButton: Story = {
   render: (args) => (
-    <Badge {...args} render={(props) => <button type="button" {...props} />}>
-      {args.children}
-    </Badge>
+    <Badge render={(props) => <button type="button" {...props} />} {...args} />
   ),
   args: {
     children: "Button Badge",
     variant: "secondary",
+  },
+};
+
+/**
+ * Test to verify render prop functionality works correctly.
+ */
+export const RenderPropTest: Story = {
+  name: "Render prop should create correct elements",
+  tags: ["!dev", "!autodocs"],
+  render: () => (
+    <div className="flex gap-4">
+      <Badge data-testid="default-badge">Default</Badge>
+      <Badge
+        data-testid="link-badge"
+        render={(props) => <a href="#" {...props} />}
+      >
+        Link
+      </Badge>
+      <Badge
+        data-testid="button-badge"
+        render={(props) => <button type="button" {...props} />}
+      >
+        Button
+      </Badge>
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("should render default badge as span", async () => {
+      const badge = canvas.getByTestId("default-badge");
+      expect(badge.tagName.toLowerCase()).toBe("span");
+      expect(badge).toHaveTextContent("Default");
+    });
+
+    await step("should render link badge as anchor", async () => {
+      const badge = canvas.getByTestId("link-badge");
+      expect(badge.tagName.toLowerCase()).toBe("a");
+      expect(badge).toHaveTextContent("Link");
+      expect(badge).toHaveAttribute("href", "#");
+    });
+
+    await step("should render button badge as button", async () => {
+      const badge = canvas.getByTestId("button-badge");
+      expect(badge.tagName.toLowerCase()).toBe("button");
+      expect(badge).toHaveTextContent("Button");
+      expect(badge).toHaveAttribute("type", "button");
+    });
+
+    await step("should apply badge styles to all variants", async () => {
+      const defaultBadge = canvas.getByTestId("default-badge");
+      const linkBadge = canvas.getByTestId("link-badge");
+      const buttonBadge = canvas.getByTestId("button-badge");
+
+      // All should have the data-slot attribute
+      expect(defaultBadge).toHaveAttribute("data-slot", "badge");
+      expect(linkBadge).toHaveAttribute("data-slot", "badge");
+      expect(buttonBadge).toHaveAttribute("data-slot", "badge");
+
+      // All should have badge styling classes
+      const badgeClasses = [
+        "inline-flex",
+        "items-center",
+        "justify-center",
+        "rounded-md",
+      ];
+      
+      badgeClasses.forEach((className) => {
+        expect(defaultBadge).toHaveClass(className);
+        expect(linkBadge).toHaveClass(className);
+        expect(buttonBadge).toHaveClass(className);
+      });
+    });
   },
 };

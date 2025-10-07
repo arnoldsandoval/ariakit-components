@@ -6,6 +6,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
+  useAccordionContext,
 } from "@/components/accordion";
 
 /**
@@ -353,5 +354,52 @@ export const UsingRenderProp: Story = {
         </AccordionItem>
       </Accordion>
     );
+  },
+};
+
+/**
+ * Component that deliberately calls useAccordionContext outside of Accordion context
+ * to trigger the error case for test coverage
+ */
+const InvalidAccordionUsage = () => {
+  try {
+    useAccordionContext(); // This should throw our custom error
+    return <div>This should not render</div>;
+  } catch (error) {
+    return (
+      <div data-testid="error-caught" className="text-red-500 text-sm">
+        Error: {(error as Error).message}
+      </div>
+    );
+  }
+};
+
+export const ContextErrorTest: Story = {
+  name: "Accordion components should throw error when used outside context",
+  tags: ["!dev", "!autodocs"],
+  parameters: {
+    a11y: { disable: true }, // Disable a11y testing for error demonstration
+  },
+  render: () => (
+    <div data-testid="context-test" className="p-4 border border-red-200 bg-red-50 rounded">
+      <h3 className="font-semibold text-red-800 mb-2">Context Error Test</h3>
+      <p className="text-red-700 text-sm mb-2">
+        If AccordionItem or AccordionTrigger components are used outside of an Accordion component,
+        they will throw an error. This component demonstrates that behavior:
+      </p>
+      <InvalidAccordionUsage />
+      <p className="text-red-700 text-xs mt-2">
+        The error above validates that useAccordionContext properly throws when context is null.
+      </p>
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    
+    await step("verify context error is thrown and caught", async () => {
+      const errorDiv = canvas.getByTestId("error-caught");
+      expect(errorDiv).toBeInTheDocument();
+      expect(errorDiv).toHaveTextContent("Accordion components must be used within an Accordion");
+    });
   },
 };
