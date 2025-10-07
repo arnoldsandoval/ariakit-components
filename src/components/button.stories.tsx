@@ -1,6 +1,7 @@
 import { Button } from "@/components/button";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowUpRight, GitBranch, Loader2 } from "lucide-react";
+import { fn } from "storybook/test";
 
 /**
  * Displays a button or a component that looks like a button.
@@ -41,6 +42,7 @@ const meta: Meta<typeof Button> = {
     size: "default",
     children: "Button",
     disabled: false,
+    onClick: fn(),
   },
 } satisfies Meta<typeof Button>;
 
@@ -200,24 +202,41 @@ export const SizeVariations: Story = {
   render: () => (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <Button size="sm" variant="outline">
+        <Button size="sm" variant="outline" onClick={fn()}>
           Small
         </Button>
-        <Button size="icon-sm" aria-label="Submit" variant="outline">
+        <Button
+          size="icon-sm"
+          aria-label="Submit"
+          variant="outline"
+          onClick={fn()}
+        >
           <ArrowUpRight />
         </Button>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="outline">Default</Button>
-        <Button size="icon" aria-label="Submit" variant="outline">
+        <Button variant="outline" onClick={fn()}>
+          Default
+        </Button>
+        <Button
+          size="icon"
+          aria-label="Submit"
+          variant="outline"
+          onClick={fn()}
+        >
           <ArrowUpRight />
         </Button>
       </div>
       <div className="flex items-center gap-2">
-        <Button size="lg" variant="outline">
+        <Button size="lg" variant="outline" onClick={fn()}>
           Large
         </Button>
-        <Button size="icon-lg" aria-label="Submit" variant="outline">
+        <Button
+          size="icon-lg"
+          aria-label="Submit"
+          variant="outline"
+          onClick={fn()}
+        >
           <ArrowUpRight />
         </Button>
       </div>

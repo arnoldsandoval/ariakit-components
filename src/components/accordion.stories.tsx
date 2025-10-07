@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 import {
   Accordion,
@@ -40,6 +40,7 @@ const meta = {
     type: "single",
     collapsible: true,
     disabled: false,
+    onValueChange: fn(),
   },
   parameters: {
     layout: "padded",

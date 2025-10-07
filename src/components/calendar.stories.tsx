@@ -2,8 +2,7 @@ import { Calendar } from "@/components/calendar";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { addDays } from "date-fns";
 import * as React from "react";
-import { action } from "storybook/actions";
-import { expect, userEvent } from "storybook/test";
+import { expect, fn, userEvent } from "storybook/test";
 
 /**
  * A date field component that allows users to enter and edit date.
@@ -33,7 +32,7 @@ const meta = {
   args: {
     mode: "single",
     selected: new Date(),
-    onSelect: action("onDayClick"),
+    onSelect: fn(),
     className: "rounded-md border w-fit",
     disabled: false,
     numberOfMonths: 1,
@@ -143,10 +142,12 @@ export const DateOfBirth: Story = {
 export const FormExample: Story = {
   render: (args) => {
     const [date, setDate] = React.useState<Date | undefined>(new Date());
-    
+
     return (
       <div className="space-y-4">
-        <div className="text-sm font-medium">Selected date: {date?.toLocaleDateString() || "None"}</div>
+        <div className="text-sm font-medium">
+          Selected date: {date?.toLocaleDateString() || "None"}
+        </div>
         <Calendar
           mode="single"
           selected={date}

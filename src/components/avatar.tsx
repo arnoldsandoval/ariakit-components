@@ -1,30 +1,39 @@
 import { cn } from "@/lib/utils";
-import * as React from "react";
+import {
+  ComponentProps,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 // Context to manage avatar state
 interface AvatarContextValue {
   imageLoadingStatus: "idle" | "loading" | "loaded" | "error";
-  setImageLoadingStatus: (status: "idle" | "loading" | "loaded" | "error") => void;
+  setImageLoadingStatus: (
+    status: "idle" | "loading" | "loaded" | "error"
+  ) => void;
 }
 
-const AvatarContext = React.createContext<AvatarContextValue | null>(null);
+const AvatarContext = createContext<AvatarContextValue | null>(null);
 
 function useAvatarContext() {
-  const context = React.useContext(AvatarContext);
+  const context = useContext(AvatarContext);
   if (!context) {
     throw new Error("Avatar components must be used within Avatar");
   }
   return context;
 }
 
-function Avatar({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
-  const [imageLoadingStatus, setImageLoadingStatus] = React.useState<"idle" | "loading" | "loaded" | "error">("idle");
+function Avatar({ className, ...props }: ComponentProps<"div">) {
+  const [imageLoadingStatus, setImageLoadingStatus] = useState<
+    "idle" | "loading" | "loaded" | "error"
+  >("idle");
 
   return (
-    <AvatarContext.Provider value={{ imageLoadingStatus, setImageLoadingStatus }}>
+    <AvatarContext.Provider
+      value={{ imageLoadingStatus, setImageLoadingStatus }}
+    >
       <div
         data-slot="avatar"
         className={cn(
@@ -37,15 +46,10 @@ function Avatar({
   );
 }
 
-function AvatarImage({
-  src,
-  alt,
-  className,
-  ...props
-}: React.ComponentProps<"img">) {
+function AvatarImage({ src, alt, className, ...props }: ComponentProps<"img">) {
   const { imageLoadingStatus, setImageLoadingStatus } = useAvatarContext();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!src) {
       setImageLoadingStatus("error");
       return;
@@ -84,11 +88,11 @@ function AvatarFallback({
   delayMs = 0,
   children,
   ...props
-}: React.ComponentProps<"div"> & { delayMs?: number }) {
+}: ComponentProps<"div"> & { delayMs?: number }) {
   const { imageLoadingStatus } = useAvatarContext();
-  const [canRender, setCanRender] = React.useState(delayMs === 0);
+  const [canRender, setCanRender] = useState(delayMs === 0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (delayMs > 0) {
       const timer = setTimeout(() => setCanRender(true), delayMs);
       return () => clearTimeout(timer);

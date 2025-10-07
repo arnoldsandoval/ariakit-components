@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
-import { expect, userEvent } from "storybook/test";
+import { expect, fn, userEvent } from "storybook/test";
 
 import { Card, CardContent } from "@/components/card";
 import {
@@ -193,6 +193,9 @@ export const WithOptions: Story = {
  * Use state and the `setApi` prop to get an instance of the carousel API.
  */
 export const WithAPI: Story = {
+  args: {
+    onSlideChange: fn(),
+  },
   render: function CarouselWithAPI(args) {
     const [api, setApi] = React.useState<CarouselApi>();
     const [current, setCurrent] = React.useState(0);
@@ -206,10 +209,19 @@ export const WithAPI: Story = {
       setCount(api.scrollSnapList().length);
       setCurrent(api.selectedScrollSnap() + 1);
 
-      api.on("select", () => {
-        setCurrent(api.selectedScrollSnap() + 1);
-      });
-    }, [api]);
+      const onSelect = () => {
+        const newSlide = api.selectedScrollSnap() + 1;
+        setCurrent(newSlide);
+        // Properly call the action from args
+        args.onSlideChange?.(`Slide changed to ${newSlide}`, { slide: newSlide, total: count });
+      };
+
+      api.on("select", onSelect);
+
+      return () => {
+        api.off("select", onSelect);
+      };
+    }, [api, args.onSlideChange, count]);
 
     return (
       <div className="w-full max-w-xs">
@@ -277,7 +289,7 @@ export const KeyboardNavigation: Story = {
 
     React.useEffect(() => {
       if (!api) return;
-      
+
       setCurrent(api.selectedScrollSnap());
       api.on("select", () => {
         setCurrent(api.selectedScrollSnap());
@@ -293,7 +305,9 @@ export const KeyboardNavigation: Story = {
                 <div className="p-1">
                   <Card>
                     <CardContent className="flex aspect-square items-center justify-center p-6">
-                      <span className="text-4xl font-semibold">{index + 1}</span>
+                      <span className="text-4xl font-semibold">
+                        {index + 1}
+                      </span>
                     </CardContent>
                   </Card>
                 </div>
@@ -313,80 +327,84 @@ export const KeyboardNavigation: Story = {
     // Wait for carousel to be ready
     const carousel = await canvas.findByRole("region");
     const slideIndicator = await canvas.findByTestId("current-slide");
-    
+
     // Verify initial state
     await step("Initial state should be slide 0", async () => {
       expect(slideIndicator).toHaveTextContent("Slide 0");
     });
-    
+
     // Test ArrowRight navigation
     await step("ArrowRight should navigate forward", async () => {
-      const rightEvent = new KeyboardEvent('keydown', { 
-        key: 'ArrowRight', 
+      const rightEvent = new KeyboardEvent("keydown", {
+        key: "ArrowRight",
         bubbles: true,
-        cancelable: true 
+        cancelable: true,
       });
       carousel.dispatchEvent(rightEvent);
-      
+
       // Wait for animation/state update
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       expect(slideIndicator).toHaveTextContent("Slide 1");
-      
+
       // Navigate again
       carousel.dispatchEvent(rightEvent);
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       expect(slideIndicator).toHaveTextContent("Slide 2");
     });
-    
+
     // Test ArrowLeft navigation
     await step("ArrowLeft should navigate backward", async () => {
-      const leftEvent = new KeyboardEvent('keydown', { 
-        key: 'ArrowLeft', 
+      const leftEvent = new KeyboardEvent("keydown", {
+        key: "ArrowLeft",
         bubbles: true,
-        cancelable: true 
+        cancelable: true,
       });
       carousel.dispatchEvent(leftEvent);
-      
+
       // Wait for animation/state update
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       expect(slideIndicator).toHaveTextContent("Slide 1");
-      
+
       // Navigate back to start
       carousel.dispatchEvent(leftEvent);
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       expect(slideIndicator).toHaveTextContent("Slide 0");
     });
-    
+
     // Test that other keys don't navigate
     await step("Other keys should not navigate", async () => {
-      const upEvent = new KeyboardEvent('keydown', { 
-        key: 'ArrowUp', 
+      const upEvent = new KeyboardEvent("keydown", {
+        key: "ArrowUp",
         bubbles: true,
-        cancelable: true 
+        cancelable: true,
       });
       carousel.dispatchEvent(upEvent);
-      
-      await new Promise(resolve => setTimeout(resolve, 300));
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
       // Should still be at slide 0
       expect(slideIndicator).toHaveTextContent("Slide 0");
     });
-    
+
     // Test preventDefault behavior
     await step("Arrow keys should preventDefault", async () => {
       let defaultPrevented = false;
-      const preventableEvent = new KeyboardEvent('keydown', { 
-        key: 'ArrowRight', 
+      const preventableEvent = new KeyboardEvent("keydown", {
+        key: "ArrowRight",
         bubbles: true,
-        cancelable: true 
+        cancelable: true,
       });
-      
+
       // Add listener to check if default was prevented
-      carousel.addEventListener('keydown', (e) => {
-        if (e.defaultPrevented) defaultPrevented = true;
-      }, { once: true });
-      
+      carousel.addEventListener(
+        "keydown",
+        (e) => {
+          if (e.defaultPrevented) defaultPrevented = true;
+        },
+        { once: true }
+      );
+
       carousel.dispatchEvent(preventableEvent);
-      
+
       // The carousel should have called preventDefault on arrow keys
       expect(preventableEvent.defaultPrevented || defaultPrevented).toBe(true);
     });

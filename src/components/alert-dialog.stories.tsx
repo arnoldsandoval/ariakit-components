@@ -11,7 +11,7 @@ import {
 } from "@/components/alert-dialog";
 import { Button } from "@/components/button";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { userEvent, within } from "storybook/test";
+import { fn, userEvent, within } from "storybook/test";
 
 /**
  * A modal dialog that interrupts the user with important content and expects
@@ -35,26 +35,35 @@ type Story = StoryObj<typeof meta>;
  * The default alert dialog with cancel and continue buttons.
  */
 export const Default: Story = {
-  render: () => (
-    <AlertDialog>
-      <AlertDialogTrigger render={<Button variant="outline" />}>
-        Show Dialog
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  ),
+  render: () => {
+    const onCancel = fn();
+    const onAction = fn();
+
+    return (
+      <AlertDialog>
+        <AlertDialogTrigger render={<Button variant="outline" />}>
+          Show Dialog
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              account and remove your data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => onCancel("Dialog cancelled")}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => onAction("Dialog confirmed")}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  },
 };
 
 /**
