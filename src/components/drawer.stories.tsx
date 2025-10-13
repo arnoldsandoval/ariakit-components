@@ -19,8 +19,8 @@ import {
 } from "@/components/drawer";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { useMediaQuery } from "usehooks-ts";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
