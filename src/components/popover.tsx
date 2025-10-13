@@ -1,10 +1,15 @@
 import * as Ariakit from "@ariakit/react";
-import * as React from "react";
+import {
+  ComponentPropsWithoutRef,
+  ElementRef,
+  forwardRef,
+  ReactNode,
+} from "react";
 
 import { cn } from "@/lib/utils";
 
 interface PopoverProps {
-  children: React.ReactNode;
+  children: ReactNode;
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -35,9 +40,9 @@ function Popover({
   );
 }
 
-const PopoverTrigger = React.forwardRef<
+const PopoverTrigger = forwardRef<
   HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof Ariakit.PopoverDisclosure>
+  ComponentPropsWithoutRef<typeof Ariakit.PopoverDisclosure>
 >(({ className, ...props }, ref) => (
   <Ariakit.PopoverDisclosure
     ref={ref}
@@ -49,7 +54,7 @@ const PopoverTrigger = React.forwardRef<
 PopoverTrigger.displayName = "PopoverTrigger";
 
 interface PopoverContentProps
-  extends React.ComponentPropsWithoutRef<typeof Ariakit.Popover> {
+  extends ComponentPropsWithoutRef<typeof Ariakit.Popover> {
   // For backwards compatibility with Radix API
   align?: "start" | "center" | "end";
   side?: "top" | "bottom" | "left" | "right";
@@ -57,17 +62,8 @@ interface PopoverContentProps
   alignOffset?: number;
 }
 
-const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-  (
-    {
-      className,
-      sideOffset = 4,
-      alignOffset = 0,
-      children,
-      ...props
-    },
-    ref
-  ) => {
+const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(
+  ({ className, sideOffset = 4, alignOffset = 0, children, ...props }, ref) => {
     return (
       <Ariakit.Popover
         ref={ref}
@@ -88,9 +84,9 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
 PopoverContent.displayName = "PopoverContent";
 
 // PopoverAnchor - for custom positioning reference
-const PopoverAnchor = React.forwardRef<
-  React.ElementRef<typeof Ariakit.PopoverAnchor>,
-  React.ComponentPropsWithoutRef<typeof Ariakit.PopoverAnchor>
+const PopoverAnchor = forwardRef<
+  ElementRef<typeof Ariakit.PopoverAnchor>,
+  ComponentPropsWithoutRef<typeof Ariakit.PopoverAnchor>
 >((props, ref) => (
   <Ariakit.PopoverAnchor ref={ref} data-slot="popover-anchor" {...props} />
 ));
