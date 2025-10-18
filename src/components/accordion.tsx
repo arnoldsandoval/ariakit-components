@@ -4,6 +4,7 @@ import {
   Disclosure,
   DisclosureContent,
   DisclosureProvider,
+  useDisclosureStore,
 } from "@ariakit/react";
 import { ChevronDownIcon } from "lucide-react";
 import * as React from "react";
@@ -11,14 +12,9 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface AccordionContextValue {
-  type?: "single" | "multiple";
+  type: "single" | "multiple";
   collapsible?: boolean;
   disabled?: boolean;
-  value?: string | string[];
-  onValueChange?: (value: string | string[]) => void;
-  defaultValue?: string | string[];
-  openItem?: string;
-  setOpenItem?: (value: string | null) => void;
 }
 
 const AccordionContext = React.createContext<AccordionContextValue | null>(
@@ -41,6 +37,7 @@ function Accordion({
   onValueChange,
   defaultValue,
   className,
+  children,
   ...props
 }: {
   type?: "single" | "multiple";
@@ -49,88 +46,135 @@ function Accordion({
   value?: string | string[];
   onValueChange?: (value: string | string[]) => void;
   defaultValue?: string | string[];
+  children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) {
-  const [openItem, setOpenItem] = React.useState<string | null>(() => {
-    if (type === "single" && typeof defaultValue === "string") {
-      return defaultValue;
+  // Track open state for single mode accordion behavior
+  const [openItems, setOpenItems] = React.useState<Set<string>>(() => {
+    if (value !== undefined) {
+      return new Set(Array.isArray(value) ? value : [value].filter(Boolean));
     }
-    return null;
+    if (defaultValue !== undefined) {
+      return new Set(
+        Array.isArray(defaultValue)
+          ? defaultValue
+          : [defaultValue].filter(Boolean)
+      );
+    }
+    return new Set();
   });
+
+  // Keep internal state in sync with controlled value
+  React.useEffect(() => {
+    if (value !== undefined) {
+      const newOpenItems = Array.isArray(value)
+        ? value
+        : [value].filter(Boolean);
+      setOpenItems(new Set(newOpenItems));
+    }
+  }, [value]);
+
+  const handleItemToggle = React.useCallback(
+    (itemValue: string, isOpen: boolean) => {
+      setOpenItems((prev) => {
+        const newOpenItems = new Set(prev);
+
+        if (type === "single") {
+          if (isOpen) {
+            // For single mode, close all others and open this one
+            newOpenItems.clear();
+            newOpenItems.add(itemValue);
+          } else if (collapsible) {
+            // Only allow closing if collapsible is true
+            newOpenItems.delete(itemValue);
+          } else {
+            // If not collapsible, keep it open
+            return prev;
+          }
+        } else {
+          // Multiple mode
+          if (isOpen) {
+            newOpenItems.add(itemValue);
+          } else {
+            newOpenItems.delete(itemValue);
+          }
+        }
+
+        // Call onValueChange with the new value
+        const newValue = Array.from(newOpenItems);
+        const valueToEmit = type === "single" ? newValue[0] || "" : newValue;
+
+        onValueChange?.(valueToEmit);
+
+        return newOpenItems;
+      });
+    },
+    [type, collapsible, onValueChange]
+  );
 
   const contextValue = React.useMemo(
     () => ({
       type,
       collapsible,
       disabled,
-      value,
-      onValueChange,
-      defaultValue,
-      openItem: openItem || undefined,
-      setOpenItem: (value: string | null) => setOpenItem(value),
     }),
-    [type, collapsible, disabled, value, onValueChange, defaultValue, openItem]
+    [type, collapsible, disabled]
   );
 
   return (
     <AccordionContext.Provider value={contextValue}>
-      <div data-slot="accordion" className={className} {...props} />
+      <div data-slot="accordion" className={className} {...props}>
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child) && child.type === AccordionItem) {
+            const itemValue = child.props.value;
+            const isOpen = openItems.has(itemValue);
+
+            return React.cloneElement(child, {
+              ...child.props,
+              isOpen,
+              onToggle: handleItemToggle,
+            });
+          }
+          return child;
+        })}
+      </div>
     </AccordionContext.Provider>
   );
 }
 
 function AccordionItem({
   value,
+  isOpen,
+  onToggle,
   className,
+  children,
   ...props
 }: {
   value: string;
+  isOpen?: boolean;
+  onToggle?: (value: string, isOpen: boolean) => void;
+  children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) {
   const accordionContext = useAccordionContext();
 
-  // Calculate default open state for multiple mode
-  const defaultOpen = React.useMemo(() => {
-    if (accordionContext.defaultValue !== undefined) {
-      return (
-        Array.isArray(accordionContext.defaultValue) &&
-        accordionContext.defaultValue.includes(value)
-      );
-    }
-    return false;
-  }, [accordionContext.defaultValue, value]);
+  // Use Ariakit's disclosure store for proper accessibility and state management
+  const disclosure = useDisclosureStore({
+    open: isOpen,
+    setOpen: (open) => {
+      onToggle?.(value, open);
+    },
+  });
 
-  if (accordionContext.type === "single") {
-    // For single mode, use controlled state
-    const isOpen = accordionContext.openItem === value;
-
-    const handleOpenChange = (open: boolean) => {
-      if (open) {
-        accordionContext.setOpenItem?.(value);
-      } else if (accordionContext.collapsible) {
-        accordionContext.setOpenItem?.(null);
-      }
-    };
-
-    return (
-      <DisclosureProvider open={isOpen} setOpen={handleOpenChange}>
-        <div
-          data-slot="accordion-item"
-          className={cn("border-b last:border-b-0", className)}
-          {...props}
-        />
-      </DisclosureProvider>
-    );
-  } else {
-    // For multiple mode, use uncontrolled state
-    return (
-      <DisclosureProvider defaultOpen={defaultOpen}>
-        <div
-          data-slot="accordion-item"
-          className={cn("border-b last:border-b-0", className)}
-          {...props}
-        />
-      </DisclosureProvider>
-    );
-  }
+  return (
+    <DisclosureProvider store={disclosure}>
+      <div
+        data-slot="accordion-item"
+        className={cn("border-b last:border-b-0", className)}
+        {...props}
+      >
+        {children}
+      </div>
+    </DisclosureProvider>
+  );
 }
 
 function AccordionTrigger({
