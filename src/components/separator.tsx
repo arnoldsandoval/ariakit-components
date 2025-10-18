@@ -1,7 +1,7 @@
-import * as React from "react"
-import { Separator as AriakitSeparator } from "@ariakit/react"
+import { Separator as AriakitSeparator } from "@ariakit/react";
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Separator({
   className,
@@ -13,12 +13,12 @@ function Separator({
       data-slot="separator"
       orientation={orientation}
       className={cn(
-        "bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px",
+        "bg-border shrink-0 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full aria-[orientation=vertical]:h-full aria-[orientation=vertical]:w-px",
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Separator }
+export { Separator };
