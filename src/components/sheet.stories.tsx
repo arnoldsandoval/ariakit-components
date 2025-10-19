@@ -58,7 +58,9 @@ const meta: Meta<typeof SheetContent> = {
         </div>
         <SheetFooter>
           <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
-          <SheetClose render={<Button type="submit" />}>Save changes</SheetClose>
+          <SheetClose render={<Button type="submit" />}>
+            Save changes
+          </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>
@@ -79,31 +81,34 @@ export const Default: Story = {};
 
 /**
  * You can adjust the size of the sheet using CSS classes on SheetContent.
+ * This example shows a sheet that takes up 2/3 of the screen width.
  */
 export const CustomSize: Story = {
   render: () => (
     <Sheet>
       <SheetTrigger render={<Button variant="outline" />}>Open</SheetTrigger>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="!w-2/3 sm:!w-2/3 !max-w-none">
         <SheetHeader>
           <SheetTitle>Edit profile</SheetTitle>
           <SheetDescription>
             Make changes to your profile here. Click save when you&apos;re done.
           </SheetDescription>
         </SheetHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid flex-1 auto-rows-min gap-6 px-4">
           <div className="grid gap-3">
-            <Label htmlFor="name-size">Name</Label>
-            <Input id="name-size" defaultValue="Pedro Duarte" />
+            <Label htmlFor="sheet-demo-name">Name</Label>
+            <Input id="sheet-demo-name" defaultValue="Pedro Duarte" />
           </div>
           <div className="grid gap-3">
-            <Label htmlFor="username-size">Username</Label>
-            <Input id="username-size" defaultValue="@peduarte" />
+            <Label htmlFor="sheet-demo-username">Username</Label>
+            <Input id="sheet-demo-username" defaultValue="@peduarte" />
           </div>
         </div>
         <SheetFooter>
           <SheetClose render={<Button variant="outline" />}>Cancel</SheetClose>
-          <SheetClose render={<Button type="submit" />}>Save changes</SheetClose>
+          <SheetClose render={<Button type="submit" />}>
+            Save changes
+          </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>
@@ -111,30 +116,69 @@ export const CustomSize: Story = {
 };
 
 /**
- * Sheet sliding in from the left side.
+ * Use the `side` prop to specify which edge of the screen the sheet slides in from.
+ * Available options: top, right, bottom, left.
  */
-export const FromLeft: Story = {
-  args: {
-    side: "left",
-  },
-};
+export const Sides: Story = {
+  render: () => (
+    <div className="flex flex-col items-center gap-8 p-8">
+      <Sheet>
+        <SheetTrigger render={<Button variant="outline" />}>Top</SheetTrigger>
+        <SheetContent side="top">
+          <SheetHeader>
+            <SheetTitle>Sheet from Top</SheetTitle>
+            <SheetDescription>
+              This sheet slides in from the top of the screen.
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
 
-/**
- * Sheet sliding in from the top.
- */
-export const FromTop: Story = {
-  args: {
-    side: "top",
-  },
-};
+      <div className="flex gap-8">
+        <Sheet>
+          <SheetTrigger render={<Button variant="outline" />}>
+            Left
+          </SheetTrigger>
+          <SheetContent side="left">
+            <SheetHeader>
+              <SheetTitle>Sheet from Left</SheetTitle>
+              <SheetDescription>
+                This sheet slides in from the left side of the screen.
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
 
-/**
- * Sheet sliding in from the bottom.
- */
-export const FromBottom: Story = {
-  args: {
-    side: "bottom",
-  },
+        <Sheet>
+          <SheetTrigger render={<Button variant="outline" />}>
+            Right
+          </SheetTrigger>
+          <SheetContent side="right">
+            <SheetHeader>
+              <SheetTitle>Sheet from Right</SheetTitle>
+              <SheetDescription>
+                This sheet slides in from the right side of the screen.
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      <Sheet>
+        <SheetTrigger render={<Button variant="outline" />}>
+          Bottom
+        </SheetTrigger>
+        <SheetContent side="bottom">
+          <SheetHeader>
+            <SheetTitle>Sheet from Bottom</SheetTitle>
+            <SheetDescription>
+              This sheet slides in from the bottom of the screen.
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
+    </div>
+  ),
 };
 
 export const ShouldOpenCloseWithSubmit: Story = {

@@ -112,7 +112,7 @@ export const UsingRenderProp: Story = {
 /**
  * Multiple tooltips with different placements and content.
  */
-export const ComplexExample: Story = {
+export const Placements: Story = {
   render: () => (
     <TooltipProvider>
       <div className="flex flex-col items-center gap-8 p-8">
