@@ -42,7 +42,7 @@ const invoices = [
 ];
 
 /**
- * Powerful table and datagrids built using TanStack Table.
+ * A simple HTML table component.
  */
 const meta = {
   title: "ui/Table",
@@ -304,7 +304,7 @@ export const Grouped: Story = {
               </TableRow>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="">{item.description}</TableCell>
+                  <TableCell>{item.description}</TableCell>
                   <TableCell>{item.date}</TableCell>
                   <TableCell className="text-right">
                     ${item.amount.toFixed(2)}

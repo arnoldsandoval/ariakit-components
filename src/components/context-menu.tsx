@@ -19,6 +19,8 @@ interface ContextMenuProps {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  values?: Record<string, string | string[]>;
+  setValues?: (values: Record<string, string | string[]>) => void;
 }
 
 function ContextMenu({
@@ -26,6 +28,8 @@ function ContextMenu({
   defaultOpen = false,
   open,
   onOpenChange,
+  values,
+  setValues,
 }: ContextMenuProps) {
   const [anchorRect, setAnchorRect] = React.useState<{
     x: number;
@@ -35,6 +39,8 @@ function ContextMenu({
     defaultOpen,
     open,
     setOpen: onOpenChange,
+    values,
+    setValues,
   });
 
   return (
@@ -214,13 +220,10 @@ ContextMenuItem.displayName = "ContextMenuItem";
 
 const ContextMenuCheckboxItem = React.forwardRef<
   HTMLDivElement,
-  Omit<
-    React.ComponentPropsWithoutRef<typeof Ariakit.MenuItemCheckbox>,
-    "name"
-  > & {
-    name?: string;
+  React.ComponentPropsWithoutRef<typeof Ariakit.MenuItemCheckbox> & {
+    name: string;
   }
->(({ className, children, name = "checkbox-item", ...props }, ref) => {
+>(({ className, children, name, ...props }, ref) => {
   return (
     <Ariakit.MenuItemCheckbox
       ref={ref}
@@ -232,11 +235,10 @@ const ContextMenuCheckboxItem = React.forwardRef<
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <CheckIcon
-          className="size-4 hidden data-[checked]:block"
-          data-checked={props.checked ? "" : undefined}
-        />
+      <span className="absolute inset-y-0 left-2 flex items-center justify-center">
+        <Ariakit.MenuItemCheck className="flex items-center justify-center">
+          <CheckIcon className="size-4" />
+        </Ariakit.MenuItemCheck>
       </span>
       {children}
     </Ariakit.MenuItemCheckbox>
@@ -272,11 +274,10 @@ const ContextMenuRadioItem = React.forwardRef<
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <CircleIcon
-          className="size-2 fill-current hidden data-[checked]:block"
-          data-checked={props.checked ? "" : undefined}
-        />
+      <span className="absolute inset-y-0 left-2 flex items-center justify-center">
+        <Ariakit.MenuItemCheck className="flex items-center justify-center">
+          <CircleIcon className="size-2 fill-current" />
+        </Ariakit.MenuItemCheck>
       </span>
       {children}
     </Ariakit.MenuItemRadio>

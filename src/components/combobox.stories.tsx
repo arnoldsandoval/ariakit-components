@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import { useState } from "react";
+import { fn } from "storybook/test";
 
 /**
  * A combobox component built by composing Popover and Command components.
@@ -21,6 +22,7 @@ import { useState } from "react";
 const meta = {
   title: "ui/Combobox",
   tags: ["autodocs"],
+
   decorators: [
     (Story) => (
       <div className="flex h-96 items-start justify-center">
@@ -76,6 +78,7 @@ export const Default: Story = {
   render: () => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState("");
+    const handleValueChange = fn();
 
     return (
       <Popover open={open} onOpenChange={setOpen}>
@@ -108,8 +111,11 @@ export const Default: Story = {
                   <CommandItem
                     key={framework.value}
                     value={framework.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue);
+                    onSelect={() => {
+                      const newValue =
+                        framework.value === value ? "" : framework.value;
+                      setValue(newValue);
+                      handleValueChange(newValue);
                       setOpen(false);
                     }}
                   >

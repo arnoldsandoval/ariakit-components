@@ -26,7 +26,9 @@ const meta = {
   title: "ui/ContextMenu",
   component: ContextMenu,
   tags: ["autodocs"],
-  argTypes: {},
+  argTypes: {
+    setValues: { action: "setValues" },
+  },
   args: {},
   parameters: {
     layout: "centered",
@@ -45,59 +47,73 @@ export const Default: Story = {
   args: {
     children: <></>,
   },
-  render: () => (
-    <ContextMenu>
-      <ContextMenuTrigger className="bg-accent flex h-48 w-96 items-center justify-center rounded-md border border-dashed text-sm">
-        Right click here
-      </ContextMenuTrigger>
-      <ContextMenuContent className="w-64">
-        <ContextMenuItem inset>
-          Back
-          <ContextMenuShortcut>⌘[</ContextMenuShortcut>
-        </ContextMenuItem>
-        <ContextMenuItem inset disabled>
-          Forward
-          <ContextMenuShortcut>⌘]</ContextMenuShortcut>
-        </ContextMenuItem>
-        <ContextMenuItem inset>
-          Reload
-          <ContextMenuShortcut>⌘R</ContextMenuShortcut>
-        </ContextMenuItem>
-        <ContextMenuSub>
-          <ContextMenuSubTrigger inset>More Tools</ContextMenuSubTrigger>
-          <ContextMenuSubContent className="w-48">
-            <ContextMenuItem>
-              Save Page As...
-              <ContextMenuShortcut>⇧⌘S</ContextMenuShortcut>
-            </ContextMenuItem>
-            <ContextMenuItem>Create Shortcut...</ContextMenuItem>
-            <ContextMenuItem>Name Window...</ContextMenuItem>
-            <ContextMenuSeparator />
-            <ContextMenuItem>Developer Tools</ContextMenuItem>
-          </ContextMenuSubContent>
-        </ContextMenuSub>
-        <ContextMenuSeparator />
-        <ContextMenuCheckboxItem name="show-bookmarks" checked>
-          Show Bookmarks Bar
-          <ContextMenuShortcut>⌘⇧B</ContextMenuShortcut>
-        </ContextMenuCheckboxItem>
-        <ContextMenuCheckboxItem name="show-full-urls">
-          Show Full URLs
-        </ContextMenuCheckboxItem>
-        <ContextMenuSeparator />
-        <ContextMenuRadioGroup value="pedro">
-          <ContextMenuLabel inset>People</ContextMenuLabel>
+  render: (args) => {
+    const [values, setValues] = React.useState({
+      settings: ["show-bookmarks"],
+      person: "pedro",
+    });
+
+    return (
+      <ContextMenu
+        {...args}
+        values={values}
+        setValues={(newValues) => {
+          setValues(newValues);
+          args.setValues?.(newValues);
+        }}
+      >
+        <ContextMenuTrigger className="bg-accent flex h-48 w-96 items-center justify-center rounded-md border border-dashed text-sm">
+          Right click here
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-64">
+          <ContextMenuItem inset>
+            Back
+            <ContextMenuShortcut>⌘[</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem inset disabled>
+            Forward
+            <ContextMenuShortcut>⌘]</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem inset>
+            Reload
+            <ContextMenuShortcut>⌘R</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger inset>More Tools</ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-48">
+              <ContextMenuItem>
+                Save Page As...
+                <ContextMenuShortcut>⇧⌘S</ContextMenuShortcut>
+              </ContextMenuItem>
+              <ContextMenuItem>Create Shortcut...</ContextMenuItem>
+              <ContextMenuItem>Name Window...</ContextMenuItem>
+              <ContextMenuSeparator />
+              <ContextMenuItem>Developer Tools</ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
           <ContextMenuSeparator />
-          <ContextMenuRadioItem name="person" value="pedro">
-            Pedro Duarte
-          </ContextMenuRadioItem>
-          <ContextMenuRadioItem name="person" value="colm">
-            Colm Tuite
-          </ContextMenuRadioItem>
-        </ContextMenuRadioGroup>
-      </ContextMenuContent>
-    </ContextMenu>
-  ),
+          <ContextMenuCheckboxItem name="settings" value="show-bookmarks">
+            Show Bookmarks Bar
+            <ContextMenuShortcut>⌘⇧B</ContextMenuShortcut>
+          </ContextMenuCheckboxItem>
+          <ContextMenuCheckboxItem name="settings" value="show-full-urls">
+            Show Full URLs
+          </ContextMenuCheckboxItem>
+          <ContextMenuSeparator />
+          <ContextMenuRadioGroup>
+            <ContextMenuLabel inset>People</ContextMenuLabel>
+            <ContextMenuSeparator />
+            <ContextMenuRadioItem name="person" value="pedro">
+              Pedro Duarte
+            </ContextMenuRadioItem>
+            <ContextMenuRadioItem name="person" value="colm">
+              Colm Tuite
+            </ContextMenuRadioItem>
+          </ContextMenuRadioGroup>
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  },
 };
 
 /**
@@ -209,29 +225,29 @@ export const WithCheckboxes: Story = {
   args: {
     children: <></>,
   },
-  render: () => {
-    const [showBookmarks, setShowBookmarks] = React.useState(true);
-    const [showFullUrls, setShowFullUrls] = React.useState(false);
+  render: (args) => {
+    const [values, setValues] = React.useState({
+      settings: ["show-bookmarks"],
+    });
 
     return (
-      <ContextMenu>
+      <ContextMenu
+        {...args}
+        values={values}
+        setValues={(newValues) => {
+          setValues(newValues);
+          args.setValues?.(newValues);
+        }}
+      >
         <ContextMenuTrigger className="bg-accent flex h-48 w-96 items-center justify-center rounded-md border border-dashed text-sm">
           Right click here
         </ContextMenuTrigger>
         <ContextMenuContent className="w-64">
-          <ContextMenuCheckboxItem
-            name="show-bookmarks"
-            checked={showBookmarks}
-            onCheckedChange={setShowBookmarks}
-          >
+          <ContextMenuCheckboxItem name="settings" value="show-bookmarks">
             Show Bookmarks Bar
             <ContextMenuShortcut>⌘⇧B</ContextMenuShortcut>
           </ContextMenuCheckboxItem>
-          <ContextMenuCheckboxItem
-            name="show-full-urls"
-            checked={showFullUrls}
-            onCheckedChange={setShowFullUrls}
-          >
+          <ContextMenuCheckboxItem name="settings" value="show-full-urls">
             Show Full URLs
           </ContextMenuCheckboxItem>
           <ContextMenuSeparator />
@@ -252,30 +268,29 @@ export const WithRadioGroup: Story = {
   args: {
     children: <></>,
   },
-  render: () => {
-    const [person, setPerson] = React.useState("pedro");
+  render: (args) => {
+    const [values, setValues] = React.useState({ person: "pedro" });
 
     return (
-      <ContextMenu>
+      <ContextMenu
+        {...args}
+        values={values}
+        setValues={(newValues) => {
+          setValues(newValues);
+          args.setValues?.(newValues);
+        }}
+      >
         <ContextMenuTrigger className="bg-accent flex h-48 w-96 items-center justify-center rounded-md border border-dashed text-sm">
           Right click here
         </ContextMenuTrigger>
         <ContextMenuContent className="w-64">
-          <ContextMenuRadioGroup value={person}>
+          <ContextMenuRadioGroup>
             <ContextMenuLabel>People</ContextMenuLabel>
             <ContextMenuSeparator />
-            <ContextMenuRadioItem
-              name="person"
-              value="pedro"
-              onSelect={() => setPerson("pedro")}
-            >
+            <ContextMenuRadioItem name="person" value="pedro">
               Pedro Duarte
             </ContextMenuRadioItem>
-            <ContextMenuRadioItem
-              name="person"
-              value="colm"
-              onSelect={() => setPerson("colm")}
-            >
+            <ContextMenuRadioItem name="person" value="colm">
               Colm Tuite
             </ContextMenuRadioItem>
           </ContextMenuRadioGroup>
