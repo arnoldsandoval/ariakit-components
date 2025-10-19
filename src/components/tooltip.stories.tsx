@@ -118,7 +118,7 @@ export const ComplexExample: Story = {
       <div className="flex flex-col items-center gap-8 p-8">
         <Tooltip placement="top">
           <TooltipTrigger render={<Button variant="outline" />}>
-            Top Tooltip
+            Top
           </TooltipTrigger>
           <TooltipContent>Appears on top</TooltipContent>
         </Tooltip>
@@ -141,7 +141,7 @@ export const ComplexExample: Story = {
 
         <Tooltip placement="bottom">
           <TooltipTrigger render={<Button variant="outline" />}>
-            Bottom Tooltip
+            Bottom
           </TooltipTrigger>
           <TooltipContent>Appears on bottom</TooltipContent>
         </Tooltip>
