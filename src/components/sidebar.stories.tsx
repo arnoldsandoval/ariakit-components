@@ -279,7 +279,7 @@ export const Group: Story = {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
-          <SidebarGroupAction title="Add Project" render={<button />}>
+          <SidebarGroupAction title="Add Project">
             <Plus /> <span className="sr-only">Add Project</span>
           </SidebarGroupAction>
           <SidebarGroupContent>
@@ -722,7 +722,7 @@ export const VariantInset: Story = {
             <div className="bg-muted/50 aspect-video rounded-xl" />
             <div className="bg-muted/50 aspect-video rounded-xl" />
           </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
+          <div className="bg-muted/50 flex-1 rounded-xl md:min-h-min" />
         </div>
       </SidebarInset>
     </>
@@ -742,6 +742,42 @@ export const CollapsibleIcon: Story = {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    render={<a href={item.url} />}
+                    tooltip={item.title}
+                  >
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
+  ),
+};
+
+/**
+ * Tooltip story - demonstrates SidebarMenuButton with tooltips and render prop.
+ * Tooltips only appear when sidebar is collapsed (icon mode).
+ */
+export const WithTooltips: Story = {
+  args: {
+    defaultOpen: false,
+    collapsible: "icon",
+  },
+  render: (args) => (
+    <Sidebar {...args}>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -843,7 +879,7 @@ export const Complete: Story = {
         <SidebarSeparator />
         <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
-          <SidebarGroupAction title="Add Project" render={<button />}>
+          <SidebarGroupAction title="Add Project">
             <Plus /> <span className="sr-only">Add Project</span>
           </SidebarGroupAction>
           <SidebarGroupContent>
@@ -963,7 +999,7 @@ export const CustomWidth: Story = {
           </Breadcrumb>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="bg-muted/50 min-h-[100vh] rounded-lg" />
+          <div className="bg-muted/50 rounded-lg" />
         </div>
       </SidebarInset>
     </SidebarProvider>

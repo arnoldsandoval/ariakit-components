@@ -9,7 +9,7 @@ function TooltipProvider({
   return <Ariakit.TooltipProvider data-slot="tooltip-provider" {...props} />;
 }
 
-interface TooltipProps {
+interface TooltipProps extends Omit<React.ComponentProps<typeof Ariakit.TooltipProvider>, "store"> {
   children: React.ReactNode;
   placement?: Ariakit.TooltipStoreProps["placement"];
   timeout?: number;
@@ -22,10 +22,8 @@ function Tooltip({ children, placement, timeout, ...props }: TooltipProps) {
   });
 
   return (
-    <Ariakit.TooltipProvider store={tooltip}>
-      <div data-slot="tooltip" {...props}>
-        {children}
-      </div>
+    <Ariakit.TooltipProvider store={tooltip} {...props}>
+      {children}
     </Ariakit.TooltipProvider>
   );
 }

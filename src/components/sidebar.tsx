@@ -1,6 +1,6 @@
 "use client";
 
-import { Role } from "@ariakit/react";
+import { Button as AriakitButton, Role } from "@ariakit/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 import * as React from "react";
@@ -69,24 +69,32 @@ function SidebarProvider({
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
 
-  // This is the internal state of the sidebar.
-  // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen);
+  // Read cookie on mount
+  const [_open, _setOpen] = React.useState(() => {
+    if (typeof document === "undefined") return defaultOpen;
+    const cookie = document.cookie
+      .split("; ")
+      .find((c) => c.startsWith(`${SIDEBAR_COOKIE_NAME}=`));
+    return cookie ? cookie.split("=")[1] === "true" : defaultOpen;
+  });
+
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
-      const openState = typeof value === "function" ? value(open) : value;
+      const newValue = typeof value === "function" ? value(open) : value;
       if (setOpenProp) {
-        setOpenProp(openState);
+        setOpenProp(newValue);
       } else {
-        _setOpen(openState);
+        _setOpen(newValue);
       }
-
-      // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
     [setOpenProp, open]
   );
+
+  // Save to cookie whenever open changes
+  React.useEffect(() => {
+    document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+  }, [open]);
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
@@ -396,9 +404,9 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
 function SidebarGroupLabel({
   className,
   ...props
-}: React.ComponentProps<typeof Role>) {
+}: React.ComponentProps<typeof AriakitButton>) {
   return (
-    <Role
+    <AriakitButton
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
@@ -495,26 +503,25 @@ function SidebarMenuButton({
   size = "default",
   tooltip,
   className,
+  render,
   ...props
-}: React.ComponentProps<typeof Role> & {
+}: React.ComponentProps<typeof AriakitButton> & {
   isActive?: boolean;
   tooltip?: string | React.ComponentProps<typeof TooltipContent>;
 } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const { isMobile, state } = useSidebar();
 
-  const button = (
-    <Role
-      data-slot="sidebar-menu-button"
-      data-sidebar="menu-button"
-      data-size={size}
-      data-active={isActive}
-      className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-      {...props}
-    />
-  );
+  const buttonProps = {
+    "data-slot": "sidebar-menu-button",
+    "data-sidebar": "menu-button",
+    "data-size": size,
+    "data-active": isActive,
+    className: cn(sidebarMenuButtonVariants({ variant, size }), className),
+    ...props,
+  };
 
   if (!tooltip) {
-    return button;
+    return <AriakitButton render={render} {...buttonProps} />;
   }
 
   if (typeof tooltip === "string") {
@@ -523,15 +530,15 @@ function SidebarMenuButton({
     };
   }
 
+  // Only show tooltip when sidebar is collapsed and not on mobile
+  if (state !== "collapsed" || isMobile) {
+    return <AriakitButton render={render} {...buttonProps} />;
+  }
+
   return (
-    <Tooltip>
-      <TooltipTrigger render={button} />
-      <TooltipContent
-        side="right"
-        align="center"
-        hidden={state !== "collapsed" || isMobile}
-        {...tooltip}
-      />
+    <Tooltip placement="right">
+      <TooltipTrigger render={render || <AriakitButton />} {...buttonProps} />
+      <TooltipContent {...tooltip} />
     </Tooltip>
   );
 }
@@ -658,12 +665,12 @@ function SidebarMenuSubButton({
   isActive = false,
   className,
   ...props
-}: React.ComponentProps<typeof Role> & {
+}: React.ComponentProps<typeof AriakitButton> & {
   size?: "sm" | "md";
   isActive?: boolean;
 }) {
   return (
-    <Role
+    <AriakitButton
       data-slot="sidebar-menu-sub-button"
       data-sidebar="menu-sub-button"
       data-size={size}
